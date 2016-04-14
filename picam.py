@@ -4,7 +4,7 @@ import atexit
 from flask import Flask, render_template, request
 app = Flask(__name__)
 
-# This function maps the angle we want to move the servo to, to the needed PWM value
+# This function sets the PWM for a servo when called
 def pwmSet(pulse):
 	return int(pulse)
 
@@ -14,13 +14,10 @@ pins = {
     22 : {'name' : 'tilt', 'pwm' : 1500}
     }
 
-# Create two servo objects using the RPIO PWM library
+# Initialize pigpio and set pin 22 and 23 to ouput using PIGPIO Library
 pi = pigpio.pi()
 pi.set_mode(22, pigpio.OUTPUT)
 pi.set_mode(23, pigpio.OUTPUT)
-
-# Setup the two servos and turn both to 90 degrees
-
 
 # Cleanup any open objects
 def cleanup():
@@ -42,18 +39,17 @@ def main():
 # The function below is executed when someone requests a URL with a move direction
 @app.route("/<direction>")
 def move(direction):
-    print('now in move')
     # Choose the direction of the request
     if direction == 'left':
-	    # Increment the angle by 10 degrees
+	    # Increment the PWM by 100
         np = pins[23]['pwm'] + 100
 	print(np)
-        # Verify that the new angle is not too great
+        # Verify that the new PWM is within safe range
         if int(np) <= 2400:
-            # Change the angle of the servo
+            # Change the PWM of the servo
             pi.set_servo_pulsewidth(23, np)
 
-            # Store the new angle in the pins dictionary
+            # Store the new PWM in the pins dictionary
             pins[23]['pwm'] = np
         return str(np) + ' ' + str(np)
     elif direction == 'right':
