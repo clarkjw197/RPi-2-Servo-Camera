@@ -4,10 +4,6 @@ import atexit
 from flask import Flask, render_template, request
 app = Flask(__name__)
 
-# This function sets the PWM for a servo when called
-def pwmSet(pulse):
-	return int(pulse)
-
 # Create a dictionary called pins to store the pin number, name, and angle
 pins = {
     23 : {'name' : 'pan', 'pwm' : 1500},
@@ -73,15 +69,6 @@ def move(direction):
             pi.set_servo_pulsewidth(22, np)
             pins[22]['pwm'] = np
         return str(np) + ' ' + str(np)
-
-# Function to manually set a motor to a specific pluse width
-@app.route("/<motor>/<pulsewidth>")
-def manual(motor,pulsewidth):
-    if motor == "pan":
-        pi.set_servo_pulsewidth(23, int(pulsewidth))
-    elif motor == "tilt":
-        pi.set_servo_pulsewidth(22, int(pulsewidth))
-    return "Moved"
 
 # Clean everything up when the app exits
 atexit.register(cleanup)
