@@ -31,6 +31,7 @@ def cleanup():
     pi.set_servo_pulsewidth(22, 0)
     pi.set_servo_pulsewidth(23, 0)
 
+# Load login page
 @app.route('/picam.html')
 def picam():
 	if user['name'] == 'admin':
@@ -38,7 +39,7 @@ def picam():
 	else:
 	    return redirect('/login.html')
 
-
+# Load Home page
 @app.route('/index.html')
 def index():
 	if user['name'] == 'admin':
@@ -96,13 +97,10 @@ def move(direction):
             pins[22]['pwm'] = np
         return str(np) + ' ' + str(np)
 
+# Attempts to render and templates missed.  Must be logged in to access as with all other templates.
 @app.route('/<path>')
 def catch_all(path):
         return render_template(path)
-
-
-
-
 
 # Clean everything up when the app exits
 atexit.register(cleanup)
