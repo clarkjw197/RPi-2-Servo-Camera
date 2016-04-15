@@ -1,36 +1,62 @@
 import pigpio 
 import time
 import atexit
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 
 # Create a dictionary called pins to store the pin number, name, and angle
 pins = {
-    23 : {'name' : 'pan', 'pwm' : 1500},
-    22 : {'name' : 'tilt', 'pwm' : 1500}
+    23 : {'name' : 'pan', 'pwm' : 1200},
+    22 : {'name' : 'tilt', 'pwm' : 1200}
     }
+
+# Create initial blank user for website
+user = {
+	 'name' : ' '
+    }
+
 
 # Initialize pigpio and set pin 22 and 23 to ouput using PIGPIO Library
 pi = pigpio.pi()
 pi.set_mode(22, pigpio.OUTPUT)
 pi.set_mode(23, pigpio.OUTPUT)
 
+# Set servos to neutral position
+pi.set_servo_pulsewidth(22, 1200)
+pi.set_servo_pulsewidth(23, 1200)
+
+
 # Cleanup any open objects
 def cleanup():
     pi.set_servo_pulsewidth(22, 0)
     pi.set_servo_pulsewidth(23, 0)
 
+@app.route('/picam.html')
+def picam():
+	if user['name'] == 'admin':
+	    return render_template('picam.html')
+	else:
+	    return redirect('/login.html')
+
+
+@app.route('/index.html')
+def index():
+	if user['name'] == 'admin':
+            return render_template('index.html')
+	else:
+	    return redirect('/login.html')
 
 # Load the main form template on webrequest for the root page
-@app.route("/")
-def main():
-
-    # Create a template data dictionary to send any data to the template
-    templateData = {
-        'title' : 'PiCam'
-        }
-    # Pass the template data into the template picam.html and return it to the user
-    return render_template('picam.html', **templateData)
+@app.route("/", methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] == 'admin' and request.form['password'] == 'admin':
+	    user['name'] = 'admin'
+	    return render_template('index.html')
+        else:
+            error = 'Invalid Credentials. Please try again.'
+    return render_template('login.html')
 
 # The function below is executed when someone requests a URL with a move direction
 @app.route("/<direction>")
@@ -70,8 +96,16 @@ def move(direction):
             pins[22]['pwm'] = np
         return str(np) + ' ' + str(np)
 
+@app.route('/<path>')
+def catch_all(path):
+        return render_template(path)
+
+
+
+
+
 # Clean everything up when the app exits
 atexit.register(cleanup)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=3000, debug=True)

@@ -1,13 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
-    <head>
-        <title>PiCam</title>
-        <style type="text/css">
-            .style1
-            {
-                width: 50%;
-            }
-        </style>
+      <head>
+    <title>RPi-2 Servo Home</title>
+    <strong><link rel="stylesheet" href="{{ url_for('static', filename='picam.css') }}"></strong>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
         <script language="javascript" type="text/javascript">
             function Button_onclick(direction) {
@@ -19,6 +14,13 @@
         </script>
     </head>
     <body>
+	<header>
+      <div class="container">
+        <h1 class="logo">RPi-2 Servo Pan/tilt Camera</h1>
+      </div>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('picam') }}">Picam</a>
+      </header>
 
         <table align="center" class="style1">
             <tr>
