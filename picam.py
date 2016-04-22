@@ -1,6 +1,8 @@
 import pigpio 
 import time
 import atexit
+import smtplib
+from email.mime.text import MIMEText
 from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 
@@ -96,6 +98,24 @@ def move(direction):
             pi.set_servo_pulsewidth(22, np)
             pins[22]['pwm'] = np
         return str(np) + ' ' + str(np)
+    elif direction == 'detect':
+        USERNAME = ''
+        PASSWORD = ''
+        MAILTO = ''
+
+        msg = MIMEText('Motion Detected.  Check your Camera.')
+        msg['Subject'] = 'RPI Motion Detected'
+        msg['From'] = USERNAME
+        msg['To'] = MAILTO
+
+        server = smtplib.SMTP('smtp.gmail.com',587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(USERNAME, PASSWORD)
+        server.sendmail(USERNAME, MAILTO, msg.as_string())
+        server.quit()
+        return 'Mail Sent'
 
 # Attempts to render and templates missed.  Must be logged in to access as with all other templates.
 @app.route('/<path>')
